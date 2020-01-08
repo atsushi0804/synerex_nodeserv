@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -247,14 +248,15 @@ func (s *srvNodeInfo) listNodes() {
 }
 
 // looking for Synerex Server for GW
-func getSynerexServerForGw(ServerNames string) string {
-	servers := strings.Split(ServerNames, ",")
+func getSynerexServerForGw(ServerInfo string) string {
+	ids := strings.Split(ServerInfo, ",")
 
 	serverInfos := ""
 
 	for i := range sxProfile {
-		for j := range servers {
-			if servers[j] == sxProfile[i].NodeName {
+		for j := range ids {
+			id,_ := strconv.Atoi(ids[j])
+			if int32(id) == sxProfile[i].NodeId {
 				if serverInfos != "" {
 					serverInfos += ","
 				}
@@ -356,7 +358,7 @@ func (s *srvNodeInfo) RegisterNode(cx context.Context, ni *nodepb.NodeInfo) (nid
 	serverInfo := ""
 
 	if ni.NodeType == nodepb.NodeType_GATEWAY {
-		serverInfo = getSynerexServerForGw(ni.GwInfo)
+		serverInfo = getSynerexServerForGw(ni.ServerInfo)
 	} else {
 		serverInfo = getSynerexServer(ServerId)
 	}
